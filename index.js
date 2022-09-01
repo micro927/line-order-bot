@@ -19,6 +19,7 @@ const orderWord = 'เอา'
 const finishWord = 'ปิดออเดอร์'
 
 const orderListModel = {
+    groupId: null,
     isOrdering: false,
     isAnswerWaiting: false, // รอเวอชั่นต่อไปให้ถามตอบได้ ตอนนีัช่างมัน
     orderTitle: null,
@@ -33,18 +34,24 @@ const noneStageMessageAction = async (userId, msg, displayName, groupIndex) => {
         reply = `สวัสดีคุณ ${displayName}
         
         หากต้องการให้ผมจดออเดอร์ ให้พิมพ์คำว่า ${startWord} ตามด้วยสิ่งที่อยากให้ผมจดออเดอร์ได้เลยครับ
-        เช่น *** ${startWord} กาแฟ ***
-        ครับผม : D`
+        ** เช่น: ${startWord} กาแฟ **
+        ครับผม 😃`
     }
     else if (msg.includes(startWord)) {
-        const orderTitle = msg.replace(startWord, "")
+        const orderTitle = (msg.replace(startWord, "")).trim()
         orderList[groupIndex].isOrdering = true
         orderList[groupIndex].orderTitle = orderTitle
 
-        reply = `ได้ครับ เพื่อนๆ ทุกคนในกลุ่มต้องการสั่ง ${orderTitle} เมนูอะไร
-พิมพ์ ${orderWord} ตามด้วยชื่อเมนูมาได้เลยครับ(เช่น ${orderWord} ลาเต้หวานน้อย) เดี๋ยวผมจดให้ครับ: D
+        reply = `ได้เลยครับ! เริ่มจดออเดอร์ 
+${orderTitle}
+ครับผม 😁
 
-        ปล.ถ้าสั่งกันครบแล้ว ให้พิมพ์ ปิดออเดอร์ นะครับผม`
+ทุกคนในกลุ่มต้องการสั่งเมนูอะไร ให้พิมพ์ ${orderWord} ตามด้วยชื่อเมนูมาได้เลยครับ
+** เช่น: ${orderWord} ลาเต้หวานน้อย** 
+เดี๋ยวผมจดให้ครับ 😊
+
+------
+ปล.ถ้าสั่งกันครบแล้ว ให้พิมพ์ ปิดออเดอร์ นะครับผม`
     }
     else {
         reply = null
@@ -56,7 +63,7 @@ const noneStageMessageAction = async (userId, msg, displayName, groupIndex) => {
 const OrderingStageMessageAction = async (userId, msg, displayName, groupIndex) => {
     let reply = null
     if (msg.includes(startWord)) {
-        reply = `ขออภัยด้วยครับ ขณะนี้กำลังรับออเดอร์ ${orderList.orderTitle} อยู่ครับ
+        reply = `ขออภัยด้วยครับ ขณะนี้กำลังรับออเดอร์ ${orderList.orderTitle} อยู่ครับ 😅
 
 หากต้องการให้ผมจดออเดอร์ใหม่ ให้พิมพ์ ปิดออเดอร์ นะครับผม`
     }
@@ -67,7 +74,7 @@ const OrderingStageMessageAction = async (userId, msg, displayName, groupIndex) 
         orderList[groupIndex].order = []
     }
     else if ((msg.substring(0, orderWord.length) == orderWord) && msg.length > orderWord.length) {
-        const orderName = msg.replace(orderWord, '')
+        const orderName = (msg.replace(orderWord, '')).trim()
 
         const thisIndex = orderList[groupIndex].order.findIndex(o => o.userId == userId)
         if (thisIndex > -1) { // found this user in order, update menu(orderName)
@@ -76,7 +83,9 @@ const OrderingStageMessageAction = async (userId, msg, displayName, groupIndex) 
         else { // add new 
             orderList[groupIndex].order.push({ userId, displayName, orderName })
         }
-        reply = `ออเดอร์ ${orderList[groupIndex].orderTitle} ทั้งหมด \n`
+        reply = `รับออเดอร์ ${orderList[groupIndex].orderTitle} !
+
+**ออเดอร์ทั้งหมดตอนนี้** \n`
         orderList[groupIndex].order.map((userOrder) => {
             reply = reply.concat(`คุณ ${userOrder.displayName} สั่ง => ${userOrder.orderName} \n`)
         })
@@ -113,9 +122,13 @@ const handleEvent = async (event) => {
             let thisGroupIndex = orderList.findIndex(group => group.groupId == groupId)
             if (thisGroupIndex == -1) {
                 // new group, create group-order Object
-                orderList.push({ groupId: Object.assign({}, orderListModel) })
-                thisGroupIndex = orderList.findIndex(groupId => groupId == groupId)
+                let newOrderList = Object.assign({}, orderListModel)
+                newOrderList.groupId = groupId
+                orderList.push(newOrderList)
+
+                thisGroupIndex = orderList.findIndex(group => group.groupId == groupId)
             }
+
             if (orderList[thisGroupIndex].isOrdering) {
                 thisReply = await OrderingStageMessageAction(userId, msg, displayName, thisGroupIndex)
             }
