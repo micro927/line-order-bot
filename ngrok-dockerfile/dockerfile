@@ -1,0 +1,3 @@
+FROM wernight/ngrok:latest
+ENV NGROK_AUTH '2BhPHR9cZZWIJxOgwM97IqezJpF_2X5Zstb154oamQTDS4kU8'
+CMD ["ngrok", "start", "--none"]`
