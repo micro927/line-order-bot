@@ -15,7 +15,7 @@ const client = new line.Client(lineConfig)
 
 const greetingWord = 'สวัสดีลุง'
 const startWord = 'รับออเดอร์'
-const orderWord = 'เอา'
+const orderWord = 'รับ'
 const finishWord = 'ปิดออเดอร์'
 
 const orderListModel = {
