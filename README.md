@@ -1,4 +1,5 @@
 # LINE ORDER BOT
+Fun Project #1 : LINE Chatbot for get Order in LINE's Group
 Stop copy previous order textbox and add yours. that's make your Chat room so Messy!!<br>
 Just type your order and This Chatbot will take your order and do a summary for you and your friend!
 
